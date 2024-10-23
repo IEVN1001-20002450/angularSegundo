@@ -1,21 +1,38 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MessageservService } from '../messageserv.service';
-
+ 
 @Component({
   selector: 'app-add-message',
   standalone: true,
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './add-message.component.html',
   styles: ``
 })
-export class AddMessageComponent {
-
-  constructor(public messageService: MessageservService) { }
+export class AddMessageComponent implements OnInit {
   alumno:string="";
-
-  addAlumno(){
-    this.messageService.add(this.alumno);
-    this.alumno=""
-  }
-
+ 
+  formGroup!: FormGroup;
+ 
+  constructor(private readonly fb: FormBuilder, public messageService: MessageservService){}
+ 
+   
+ 
+    ngOnInit():void{
+      this.formGroup= this.initForm()
+    }
+   
+    initForm():FormGroup{
+      return this.fb.group({
+        nombre:[''],
+      })
+    }
+ 
+    addAlumno(){
+      let{nombre} = this.formGroup.value;
+      this.messageService.add(nombre);
+      this.formGroup.get('nombre')?.setValue('')
+    }
+ 
+ 
 }
