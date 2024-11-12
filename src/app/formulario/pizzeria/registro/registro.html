@@ -1,0 +1,113 @@
+
+
+
+<div class="w-9/12 mx-auto my-10 p-10 bg-gray-200 rounded-3xl shadow-xl">
+  <div class="">
+   <img src="/img/Pizza.png" 
+    class="h-14 rounded-3xl" 
+    alt="Flowbite Logo"
+    >
+  </div>
+
+  <h3 class="text-3xl font-bold text-center text-blue-700 mb-10">Registro de Pedido</h3>
+
+  <form  [formGroup]="pedidoForm" (ngSubmit)="agregarPizza()" class="space-y-6 p-10">
+      <div>
+          <input class="w-full px-5 py-4 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="text"
+              placeholder="Nombre del cliente completo"
+              formControlName="nombreCliente"/>
+      </div>
+
+      <div>
+          <input class="w-full px-5 py-4 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="text"
+              placeholder="Ubicación exacta del cliente"
+              formControlName="direccion"/>
+      </div>
+
+      <div>
+          <input class="w-full px-5 py-4 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="tel"
+              placeholder="Número de contacto"
+              formControlName="telefono"/>
+      </div>
+
+      <div>
+          <input class="w-full px-5 py-4 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="date"
+              placeholder="Fecha de entrega"
+              formControlName="fechaCompra"/>
+      </div>
+
+      <div class="table w-full ...">
+        <div class="table-header-group ...">
+          <div class="table-row">
+            <div class="table-cell text-left bg-white p-3 rounded-lg ml-4">
+              <h4 class="text-2xl font-semibold mt-8 mb-4 text-gray-700">Selecciona el Tamaño</h4>
+              <div class="grid grid-cols-3 gap-4 mb-6">
+                  <label class="flex items-center gap-2">
+                      <input type="radio" formControlName="tamanoPizza" value="Chica" class="text-indigo-500" />
+                      <span>Chica - $40</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                      <input type="radio" formControlName="tamanoPizza" value="Mediana" class="text-indigo-500" />
+                      <span>Mediana - $80</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                      <input type="radio" formControlName="tamanoPizza" value="Grande" class="text-indigo-500" />
+                      <span>Grande - $120</span>
+                  </label>
+              </div>
+            </div>
+            <div class="table-cell text-left bg-white p-3 rounded-lg">
+              <h4 class="text-2xl font-semibold mt-8 mb-4 text-gray-700">Selecciona los Ingredientes</h4>
+              <div class=" grid grid-cols-3 gap-4 mb-6">
+                  <label class="flex items-center gap-2">
+                      <input type="checkbox" formControlName="jamon" class="text-indigo-500" />
+                      <span>Jamón - $10</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                      <input type="checkbox" formControlName="pina" class="text-indigo-500" />
+                      <span>Piña - $10</span>
+                  </label>
+                  <label class="flex items-center gap-2">
+                      <input type="checkbox" formControlName="champinones" class="text-indigo-500" />
+                      <span>Champiñones - $10</span>
+                  </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      
+
+      
+
+      <div>
+          <input
+              class="w-full px-5 py-4 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="number"
+              placeholder="Cantidad de Pizzas"
+              formControlName="cantidadPizzas"
+          />
+      </div>
+  </form>
+  <div class="flex justify-end mb-8">
+  <button (click) ="agregarPizza()"
+  class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+  type="submit">Añadir al Pedido
+</button>  
+</div>
+
+</div>
+
+<div class="table w-full ...">
+  <div class="table-header-group ...">
+    <div class="table-row">
+      <div class="table-cell text-left ..."><app-ventas_realizadas></app-ventas_realizadas></div>
+      <div class="table-cell text-left ..."><app-resumen></app-resumen></div>
+    </div>
+  </div>
+</div>

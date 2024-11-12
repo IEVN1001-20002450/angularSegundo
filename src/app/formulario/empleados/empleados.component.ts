@@ -1,110 +1,108 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CommonModule, NgClass, NgStyle } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 interface Empleado {
   matricula: string;
   nombre: string;
   correo: string;
   edad: number;
-  hT: number;
-  hP: number;
-  hEx: number;
-  subtotal: number;
+  horasTrabajadas: number;
 }
+
 
 @Component({
   selector: 'app-empleados',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormsModule, CommonModule],
   templateUrl: './empleados.component.html',
-  styleUrl: './empleados.component.css'
+  styles: ``
 })
+
+
 export default class EmpleadosComponent implements OnInit {
-  formGroup: FormGroup;
+
+  formGroup!: FormGroup;
   empleados: Empleado[] = [];
-  totalAPagar: number = 0;
+  mostrarTabla: boolean = false;
+  matriculaModificar: string | null = null;
+  matriculaAccion: string = '';  
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit(): void {
     this.formGroup = this.fb.group({
-      matricula: ['', Validators.required],
-      nombre: ['', Validators.required],
-      correo: ['', [Validators.required, Validators.email]],
-      edad: ['', [Validators.required, Validators.min(18)]],
-      hT: ['', [Validators.required, Validators.min(0)]]
+      matricula: [''],
+      nombre: [''],
+      correo: [''],
+      edad: [''],
+      horasTrabajadas: ['']
     });
-  }
 
-  ngOnInit() {
-    this.loadEmpleados();
-  }
-
-  onSubmit() {
-    if (this.formGroup.valid) {
-      const empleado: Empleado = { ...this.formGroup.value };
-      empleado.hP = Math.min(empleado.hT, 40);
-      empleado.hEx = Math.max(empleado.hT - 40, 0);
-      empleado.subtotal = empleado.hP * 70 + empleado.hEx * 140;
-
-      this.empleados.push(empleado);
-      this.saveEmpleados();
-      this.formGroup.reset();
+    const empleadosGuardados = localStorage.getItem('empleados');
+    if (empleadosGuardados) {
+      this.empleados = JSON.parse(empleadosGuardados);
     }
   }
 
-  modificarEmpleado() {
-    const matriculaModificar = (document.getElementById('matricula_modificar') as HTMLInputElement).value;
-    
-    // Cambio en la forma de buscar empleado
-    const empleadoEncontrado = this.empleados.find(e => e.matricula === matriculaModificar);
-    if (empleadoEncontrado) {
-      this.formGroup.setValue({ 
-        matricula: empleadoEncontrado.matricula, 
-        nombre: empleadoEncontrado.nombre, 
-        correo: empleadoEncontrado.correo, 
-        edad: empleadoEncontrado.edad, 
-        hT: empleadoEncontrado.hT 
-      });
-      this.eliminarEmpleado(); // Eliminar el empleado encontrado para luego agregarlo de nuevo
+  onSubmit(): void {
+    const nuevoEmpleado: Empleado = {
+      matricula: this.formGroup.value.matricula,
+      nombre: this.formGroup.value.nombre,
+      correo: this.formGroup.value.correo,
+      edad: this.formGroup.value.edad,
+      horasTrabajadas: this.formGroup.value.horasTrabajadas
+    };
+
+    if (this.matriculaModificar) {
+      this.empleados = this.empleados.map(emp =>
+        emp.matricula === this.matriculaModificar ? nuevoEmpleado : emp
+      );
+      this.matriculaModificar = null;
     } else {
-      alert('Empleado no encontrado');
+      this.empleados.push(nuevoEmpleado);
+    }
+
+    localStorage.setItem('empleados', JSON.stringify(this.empleados));
+    this.formGroup.reset();
+  }
+
+  calcularPago(empleado: Empleado): { subTotal: number, pagoHorasExtras: number, pagoHorasNormales: number } {
+    const horasNormales = empleado.horasTrabajadas > 40 ? 40 : empleado.horasTrabajadas;
+    const horasExtras = empleado.horasTrabajadas > 40 ? empleado.horasTrabajadas - 40 : 0;
+
+    const pagoHorasNormales = horasNormales * 70;
+    const pagoHorasExtras = horasExtras * 140;  
+    const subTotal = pagoHorasNormales + pagoHorasExtras;
+
+    return { subTotal, pagoHorasExtras, pagoHorasNormales };
+  }
+
+  calcularTotal(): number {
+    return this.empleados.reduce((total, empleado) => total + this.calcularPago(empleado).subTotal, 0);
+  }
+
+  subImprime(): void {
+    this.mostrarTabla = true;
+
+    const empleadosGuardados = localStorage.getItem('empleados');
+    if (empleadosGuardados) {
+      this.empleados = JSON.parse(empleadosGuardados);
     }
   }
 
-  eliminarEmpleado() {
-    const matriculaEliminar = (document.getElementById('matricula_modificar') as HTMLInputElement).value;
-
-    // Cambio en la forma de encontrar y eliminar empleado
-    this.empleados = this.empleados.filter(e => e.matricula !== matriculaEliminar);
-    
-    if (this.empleados.length < this.empleados.length - 1) {
-      this.saveEmpleados();
-    } else {
-      alert('Empleado no encontrado');
+  modificarMatricula(): void {
+    const empleado = this.empleados.find(emp => emp.matricula === this.matriculaAccion);
+    if (empleado) {
+      this.formGroup.patchValue(empleado);
+      this.matriculaModificar = this.matriculaAccion;
     }
   }
 
-  generarTabla() {
-    this.calcularTotalAPagar();
-  }
-
-  imprimirTabla() {
-    window.print();
-  }
-
-  private saveEmpleados() {
+  eliminarMatricula(): void {
+    this.empleados = this.empleados.filter(emp => emp.matricula !== this.matriculaAccion);
     localStorage.setItem('empleados', JSON.stringify(this.empleados));
   }
 
-  private loadEmpleados() {
-    const storedEmpleados = localStorage.getItem('empleados');
-    if (storedEmpleados) {
-      this.empleados = JSON.parse(storedEmpleados);
-      this.calcularTotalAPagar();
-    }
-  }
-
-  private calcularTotalAPagar() {
-    this.totalAPagar = this.empleados.reduce((total, empleado) => total + empleado.subtotal, 0);
-  }
+  
 }
