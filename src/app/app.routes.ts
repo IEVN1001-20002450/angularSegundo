@@ -20,5 +20,9 @@ export const routes: Routes = [
     {
         path:'formulario',
         loadChildren:()=> import('./formulario/pizzeria/pizz.routes')
+    },
+    {
+        path:'utl',
+        loadChildren:()=> import('./utl/utl.routes')
     }
 ];

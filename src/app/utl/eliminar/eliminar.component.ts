@@ -4,17 +4,15 @@ import { AlumnosUtl } from '../interfaces/alumnosutl';
 import { CommonModule, Location } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { ProyectoapiService } from '../proyectoapi.service';
- 
 @Component({
-  selector: 'app-editar',
+  selector: 'app-eliminar',
   standalone: true,
-  imports: [FormsModule,ReactiveFormsModule,CommonModule,RouterLink],
-  templateUrl: './editar.component.html',
+  imports: [FormsModule,CommonModule,RouterLink],
+  templateUrl: './eliminar.component.html',
   styles: ``
 })
-export default class EditarComponent {
+export default class EliminarComponent {
   dataSource:any=[];
-  formGroup!: FormGroup;
   tem:any;
   regAlumno:AlumnosUtl={
     matricula:0,
@@ -23,11 +21,10 @@ export default class EditarComponent {
     amaterno:'',
     correo:''
   }
-  constructor(private fb: FormBuilder,private location: Location,public alumnosUtl: ProyectoapiService, private router:Router){}
+  constructor(private location: Location,public alumnosUtl: ProyectoapiService, private router:Router){}
  
  
   ngOnInit(){
-    this.formGroup=this.initForm();
     this.tem = this.location.path().split('/')
     console.log("componente "+this.tem[3])
     this.alumnosUtl.getAlumno(parseInt(this.tem[3])).subscribe(
@@ -43,33 +40,25 @@ export default class EditarComponent {
   }
     );
   }
-  initForm():FormGroup{
-    return this.fb.group({
-      matricula: [''],
-      nombre: [''],
-      apaterno: [''],
-      amaterno: [''],
-      correo:['']
-  })
- 
-    }
  
   asignaCampos(dataSource:any){
-    this.regAlumno.matricula=dataSource.alumnos.matricula
-    this.regAlumno.nombre=dataSource.alumnos.nombre
-    this.regAlumno.apaterno=dataSource.alumnos.apaterno
-    this.regAlumno.amaterno=dataSource.alumnos.amaterno
-    this.regAlumno.correo=dataSource.alumnos.correo
-    console.log(dataSource.alumnos.matricula)
+    this.regAlumno.matricula=dataSource.alumno.matricula
+    this.regAlumno.nombre=dataSource.alumno.nombre
+    this.regAlumno.apaterno=dataSource.alumno.apaterno
+    this.regAlumno.amaterno=dataSource.alumno.amaterno
+    this.regAlumno.correo=dataSource.alumno.correo
+    console.log(dataSource.alumno.matricula)
  }
  
- modificar(){
-  this.alumnosUtl.modificarAlumno(this.tem[3],this.regAlumno).subscribe({
+ 
+ eliminar(){
+  console.log("funcion: "+this.tem[3])
+  this.alumnosUtl.EliminaAlumno(this.tem[3]).subscribe({
     next:()=>console.log(),
     error:(e)=> console.error(e),
     complete:()=>console.info()})
  
-    this.router.navigate(['/utl/listaAlumnos'])
+    this.router.navigate(['/utl/listaalumnos'])
  
 }
  
